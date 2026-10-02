@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RJ Language Academy</title></head>
+<body style="margin:0">
+<div id="status" style="font-family:system-ui;padding:24px">Loading RJ Language Academy…</div>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+(async()=>{
+ try{
+  const r=await fetch("https://rj-language-academy.floot.app/_cdn/static/14059715-403b-4fa0-bd9c-3d9924b41ef3-rj-preview.zip");
+  if(!r.ok) throw new Error("Website package could not be loaded");
+  const z=await JSZip.loadAsync(await r.arrayBuffer());
+  const f=z.file("RJ-Academy-V21-Lightweight.html");
+  if(!f) throw new Error("Website page missing");
+  const html=await f.async("string");
+  document.open(); document.write(html); document.close();
+ }catch(e){
+  document.getElementById("status").textContent="RJ Language Academy could not load: "+e.message;
+ }
+})();
+</script></body></html>
