@@ -1,0 +1,41 @@
+name: Import RJ site
+on:
+  push:
+    paths:
+      - ".github/workflows/import-rj-site.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download and unpack RJ Language Academy
+        run: |
+          python - <<'PY'
+          import io, os, zipfile, urllib.request
+          url = "https://rj-language-academy.floot.app/_cdn/static/14059715-403b-4fa0-bd9c-3d9924b41ef3-rj-preview.zip"
+          data = urllib.request.urlopen(url, timeout=60).read()
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+              for name in ["RJ-Academy-V21-Lightweight.html","RJ-Member-1.html","RJ-Member-2.html"]:
+                  with z.open(name) as src, open(name, "wb") as dst:
+                      dst.write(src.read())
+          os.replace("RJ-Academy-V21-Lightweight.html", "index.html")
+          PY
+
+      - name: Remove temporary loader files
+        run: |
+          rm -rf site
+
+      - name: Commit actual website files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html RJ-Member-1.html RJ-Member-2.html
+          git add -u
+          git commit -m "Deploy self-contained RJ Language Academy site" || exit 0
+          git push
