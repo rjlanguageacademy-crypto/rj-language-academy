@@ -270,5 +270,72 @@ mo.observe(document.body,{childList:true,subtree:true});
 ensureUI();
 window.RJ_SOUND={enabled,setEnabled:save,toggle:()=>save(!enabled()),play};
 })();
-</script>\n</body>
+</script>\n<style id="v43-live-repair-css">
+.main-nav>.nav-achievement-link{appearance:none;border:0;background:transparent;color:inherit;font:inherit;font-weight:700;padding:0;margin:0;cursor:pointer;height:82px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.main-nav>.nav-achievement-link .count{font-size:.78em;opacity:.7}.main-nav>.nav-achievement-link:hover{color:#0b63f6}
+.v43fixfb{margin-top:10px;padding:10px 12px;border-radius:8px;background:#eef8f1;color:#14532d;font-weight:700}
+@media(max-width:1000px){.main-nav.open>.nav-achievement-link{height:auto!important;display:flex!important;padding:13px 0!important;width:100%}}
+</style>
+<script id="v43-live-repairs">
+(function(){
+"use strict";
+function txt(x){return String(x||"").trim()}
+function wc(x){return txt(x).split(/\s+/).filter(Boolean).length}
+function say(s){s=txt(s);if(!s)return false;try{if(typeof window.speakBritish==="function"){window.speakBritish(s);return true}if("speechSynthesis" in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(s);u.lang="en-GB";u.rate=.9;speechSynthesis.speak(u);return true}}catch(e){}return false}
+function fb(host,msg,ok){var x=host.querySelector(".v43fixfb");if(!x){x=document.createElement("div");x.className="v43fixfb";host.appendChild(x)}x.textContent=msg;x.style.background=ok===false?"#fff1f1":"#eef8f1";x.style.color=ok===false?"#8a1c1c":"#14532d"}
+function addNext(host){if(host.querySelector("[data-v43next]"))return;var n=document.getElementById("lessonNext")||document.getElementById("genNext")||document.getElementById("prNext");if(!n)return;var b=document.createElement("button");b.type="button";b.className="rjx-btn primary";b.setAttribute("data-v43next","1");b.textContent="Continue to next →";b.style.marginLeft="8px";b.onclick=function(){n.click()};host.appendChild(b)}
+function tidy(){
+ var book=document.querySelector("header .book-btn");if(book)book.remove();
+ var b=document.getElementById("rjBadgeLaunch"),nav=document.getElementById("mainNav");
+ if(b){b.classList.remove("rj-badge-launch");b.classList.add("nav-achievement-link");b.innerHTML='Achievements <span class="count" id="rjBadgeCount">'+(document.getElementById("rjBadgeCount")?document.getElementById("rjBadgeCount").textContent:"0")+"</span>";if(nav&&!nav.contains(b)){var a=nav.querySelector('a[href="#levels"]');nav.insertBefore(b,a||null)}}
+}
+function enhance(){
+ tidy();
+ document.querySelectorAll(".v23-variety-lab").forEach(function(lab){
+   if(lab.querySelector("[data-v43check]"))return;
+   var ta=lab.querySelector("[data-v23varwrite]");if(!ta)return;
+   var row=document.createElement("div");row.className="rjx-actions";row.style.marginTop="10px";
+   var b=document.createElement("button");b.type="button";b.className="rjx-btn primary";b.setAttribute("data-v43check","1");b.textContent="Check & save";row.appendChild(b);lab.appendChild(row)
+ });
+ document.querySelectorAll(".rjx-activity-factory").forEach(function(box){
+   var task=box.querySelector(".rjx-task");
+   if(task&&/She don't usually discuss/i.test(task.textContent||""))task.textContent="She don't usually discuss project updates at work.";
+   var d=box.querySelector("#factoryDone");if(d)d.textContent="Save & mark activity complete";
+ });
+ var art=document.querySelector(".rjx-lesson");
+ if(art&&document.getElementById("markLesson")&&!art.querySelector("[data-v43lesson]")){
+   var task=art.querySelector(".rjx-task");if(task){
+    var box=document.createElement("div");box.className="rjx-card";box.style.marginTop="12px";box.setAttribute("data-v43lesson","1");
+    box.innerHTML='<h3>Your response</h3><textarea class="rjx-textarea" data-v43lessontext placeholder="Write your answer here..."></textarea><div class="rjx-actions" style="margin-top:10px"><button class="rjx-btn" type="button" data-v43modelaudio>🔊 Hear model answer</button><button class="rjx-btn primary" type="button" data-v43lessonsave>Save response</button></div>';
+    task.insertAdjacentElement("afterend",box);
+    try{var k="v43resp-"+(state.lesson.level||"")+"-"+state.lesson.unit+"-"+state.lesson.index;box.querySelector("textarea").value=localStorage.getItem(k)||""}catch(e){}
+   }
+ }
+}
+document.addEventListener("click",function(e){
+ var play=e.target.closest("[data-v23varhear]");if(play){e.preventDefault();e.stopImmediatePropagation();var lab=play.closest(".v23-variety-lab"),s="The supplier confirmed that the delivery will arrive tomorrow morning, so the team can continue the project as planned.";var ok=say(s);fb(lab,ok?"🔊 Audio is playing. Listen once, then write the key message in your own words.":"Audio was blocked by the browser. Press Play again and allow speech/audio.",ok);return}
+ var model=e.target.closest("#v27ModelToggle");if(model){e.preventDefault();e.stopImmediatePropagation();var p=document.getElementById("prFb");if(p){if(!txt(p.textContent))p.textContent="Model guidance: give a clear answer, add one useful detail, and check the target grammar or vocabulary.";p.classList.toggle("show");model.textContent=p.classList.contains("show")?"Hide model guidance":"Show model guidance"}return}
+ var chk=e.target.closest("[data-v43check]");if(chk){var lab2=chk.closest(".v23-variety-lab"),ta=lab2.querySelector("[data-v23varwrite]"),v=txt(ta.value),h=txt(lab2.querySelector("h3")&&lab2.querySelector("h3").textContent),ok2=wc(v)>=3,msg="✓ Saved and complete.";if(/Listening micro-task/i.test(h)){ok2=wc(v)>=6;msg=ok2?"✓ Saved. You captured the key message.":"Write a little more about what was confirmed, when it will happen, or what the team can do next."}if(/Say it another way/i.test(h)){var n=v.toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();ok2=n!=="the change had a significant effect on the final result"&&/(change|impact|effect|result|outcome)/.test(n);msg=ok2?"✓ Good paraphrase. The meaning is kept but the wording is different.":'Try again. Example: "The change had a major impact on the final outcome."'}fb(lab2,msg,ok2);if(ok2){try{localStorage.setItem("v43var-"+h,v)}catch(x){}chk.textContent="✓ Saved & complete";addNext(lab2)}return}
+ var save=e.target.closest("[data-v43lessonsave]");if(save){var bx=save.closest("[data-v43lesson]"),t=bx.querySelector("textarea"),vv=txt(t.value);if(wc(vv)<5){fb(bx,"Write a meaningful response before saving.",false);return}try{var kk="v43resp-"+(state.lesson.level||"")+"-"+state.lesson.unit+"-"+state.lesson.index;localStorage.setItem(kk,vv)}catch(x){}fb(bx,"✓ Response saved.",true);return}
+ var aud=e.target.closest("[data-v43modelaudio]");if(aud){var ar=aud.closest(".rjx-lesson"),hs=Array.from(ar.querySelectorAll("h3")),mh=hs.find(function(x){return /Model answer/i.test(x.textContent||"")});say(mh&&mh.nextElementSibling?mh.nextElementSibling.textContent:"");return}
+ var done=e.target.closest("#factoryDone");if(done){var box2=done.closest(".rjx-activity-factory"),title=txt(box2.querySelector("h3")&&box2.querySelector("h3").textContent),ta2=box2.querySelector("[data-prod]"),val=txt(ta2&&ta2.value),good=true,m="✓ Activity saved and complete.";if(/Sentence repair/i.test(title)){good=/she doesn'?t usually discuss project updates at work/i.test(val);m=good?"✓ Correct. The repaired sentence is natural English.":'Change it to: "She doesn’t usually discuss project updates at work."'}else if(/Build the sentence/i.test(title)){good=txt(box2.querySelector("#memberBuild")&&box2.querySelector("#memberBuild").textContent)==="I can use this language confidently";m=good?"✓ Correct. The sentence is saved and complete.":"Build the complete sentence correctly before completing."}else if(ta2){good=wc(val)>=4;m=good?"✓ Activity saved and complete.":"Add a meaningful response before completing."}if(!good){e.preventDefault();e.stopImmediatePropagation()}fb(box2,m,good);if(good){done.textContent="✓ Activity complete";setTimeout(function(){addNext(box2)},0)}return}
+ var mark=e.target.closest("#markLesson");if(mark){var bx2=document.querySelector("[data-v43lesson]"),tt=bx2&&bx2.querySelector("textarea");if(bx2&&wc(tt.value)<5){e.preventDefault();e.stopImmediatePropagation();fb(bx2,"Write and save your response before completing this lesson.",false)}else if(bx2){setTimeout(function(){addNext(bx2)},0)}}
+},true);
+var oldDict=window.renderDictionary;
+function dict(){
+ var root=document.getElementById("rjxDictionaryBody");if(!root)return;
+ root.innerHTML='<div class="rjx-card"><div class="rjx-tag">RJ WORD FINDER</div><h2>English Dictionary</h2><p>Type a word. The word appears immediately, then the definition loads.</p><div class="rjx-dict-search"><input class="rjx-input" id="dictWord" autocomplete="off" placeholder="Type a word, e.g. coherent"><button class="rjx-btn primary" id="dictGo">Search →</button></div><div id="dictStatus" class="rjx-dict-result"></div></div><div class="rjx-card" style="margin-top:16px"><h3>Saved vocabulary</h3><div id="dictSaved"></div></div>';
+ var input=root.querySelector("#dictWord"),box=root.querySelector("#dictStatus"),saved=root.querySelector("#dictSaved");
+ function gs(){try{return JSON.parse(localStorage.getItem("rjxSavedWords")||"[]")}catch(e){return[]}}
+ function ds(){var a=gs();saved.innerHTML=a.length?'<div class="rjx-syns">'+a.map(function(w){return '<button class="v27-word-pill" data-v43word="'+w.replace(/"/g,"&quot;")+'">'+w+"</button>"}).join("")+"</div>":"<p>No saved words yet.</p>";saved.querySelectorAll("[data-v43word]").forEach(function(b){b.onclick=function(){input.value=b.getAttribute("data-v43word");go()}})}
+ function draw(w,d,src){box.innerHTML='<div class="rjx-dict-word">'+w+'</div><div class="rjx-phonetic">'+(d.phon||"")+' <span class="v27-dict-source">'+src+'</span></div><p><strong>'+(d.part||"word")+"</strong> · "+(d.def||"Definition unavailable.")+'</p>'+(d.example?'<div class="rjx-task">Example: '+d.example+"</div>":"")+'<div class="rjx-actions" style="margin-top:12px"><button class="rjx-btn" id="dictHear">🔊 Hear British pronunciation</button><button class="rjx-btn primary" id="dictSave">Save vocabulary</button></div>';root.querySelector("#dictHear").onclick=function(){say(w)};root.querySelector("#dictSave").onclick=function(){var a=gs();a=[w].concat(a.filter(function(x){return x!==w})).slice(0,100);localStorage.setItem("rjxSavedWords",JSON.stringify(a));ds();this.textContent="✓ Saved"}}
+ async function go(){var w=input.value.trim().toLowerCase().replace(/[^a-z'-]/g,"");if(!w)return;draw(w,{part:"word",def:"Looking up this word…"},"searching");var L=window.V23_DICT&&V23_DICT[w];if(L){draw(w,{part:L[0],def:L[1],example:L[2],phon:(window.V23_PHONETICS&&V23_PHONETICS[w])||""},"built-in");return}try{var c=new AbortController(),to=setTimeout(function(){c.abort()},3500),r=await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w),{signal:c.signal});clearTimeout(to);if(r.ok){var data=(await r.json())[0],mm=(data.meanings||[])[0],dd=(mm&&mm.definitions||[])[0];draw(data.word||w,{part:mm&&mm.partOfSpeech||"word",def:dd&&dd.definition||"Definition unavailable.",example:dd&&dd.example||"",phon:data.phonetic||""},"online");return}}catch(x){}draw(w,{part:"word",def:"The online definition is unavailable right now. The word is still visible and can be heard or saved."},"offline")}
+ root.querySelector("#dictGo").onclick=go;input.onkeydown=function(e){if(e.key==="Enter")go()};ds()
+}
+window.renderDictionary=renderDictionary=dict;
+try{var prev=window.renderRoute||renderRoute;window.renderRoute=renderRoute=function(r){if(r==="dictionary")return dict();return prev(r)}}catch(e){}
+var mo=new MutationObserver(enhance);mo.observe(document.body,{childList:true,subtree:true});enhance();setTimeout(enhance,250);
+})();
+</script>
+</body>
 </html>
