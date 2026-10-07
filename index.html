@@ -1,1 +1,78 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RJ Language Academy</title><style>body{margin:0;background:#0b0b0b;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh}.msg{padding:24px;text-align:center}</style></head><body><div class="msg">Loading RJ Language Academy…</div><script>(async()=>{try{const files=Array.from({length:14},(_,i)=>'https://raw.githubusercontent.com/rjlanguageacademy-crypto/rj-language-academy/main/v43/part-'+String(i+1).padStart(2,'0')+'.txt');const parts=await Promise.all(files.map(f=>fetch(f,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(f+' '+r.status);return r.text()})));document.open();document.write(parts.join('\n'));document.close();}catch(e){document.body.innerHTML='<div class="msg"><h1>RJ Language Academy</h1><p>Preview failed to load.</p><pre>'+String(e)+'</pre></div>'}})();</script></body></html>
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RJ Language Academy</title>
+<style>body{margin:0;background:#0b0b0b;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh}.msg{padding:24px;text-align:center}</style>
+</head><body><div class="msg">Loading RJ Language Academy…</div>
+<script>
+(async()=>{
+try{
+  const files=Array.from({length:14},(_,i)=>'https://raw.githubusercontent.com/rjlanguageacademy-crypto/rj-language-academy/main/v43/part-'+String(i+1).padStart(2,'0')+'.txt');
+  const parts=await Promise.all(files.map(f=>fetch(f,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(f+' '+r.status);return r.text()})));
+  let html=parts.join('\n');
+  html=html.replaceAll('Ask about this lesson','Book Lesson')
+           .replaceAll('Ask About This Lesson','Book Lesson')
+           .replaceAll('Use my email app','')
+           .replaceAll('Use email app','')
+           .replaceAll('Use Email App','');
+  const patch=`
+<style id="rj-booking-fix">
+#rjBookingModal{position:fixed;inset:0;background:rgba(0,0,0,.76);z-index:999999;display:none;align-items:center;justify-content:center;padding:20px}
+#rjBookingCard{width:min(760px,96vw);max-height:92vh;overflow:auto;background:#111;color:#fff;border:1px solid #333;border-radius:18px;padding:22px;box-shadow:0 20px 70px #000}
+#rjBookingCard h2{margin:0 0 14px}.rjcalhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}.rjcalgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.rjday,.rjweekday{padding:10px 4px;text-align:center;border-radius:10px}.rjweekday{opacity:.65;font-size:12px}.rjday{background:#1e1e1e;border:1px solid #333;cursor:pointer}.rjday:hover,.rjday.sel{outline:2px solid #ff7a00}.rjday.disabled{opacity:.25;pointer-events:none}.rjtimes{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.rjtime{padding:9px 12px;border:1px solid #444;border-radius:9px;background:#181818;color:#fff;cursor:pointer}.rjtime.sel{outline:2px solid #ff7a00}.rjclose{float:right;background:none;color:#fff;border:0;font-size:28px;cursor:pointer}.rjbookfinal{margin-top:18px;padding:12px 18px;border:0;border-radius:10px;background:#ff7a00;color:#111;font-weight:700;cursor:pointer}
+</style>
+<div id="rjBookingModal"><div id="rjBookingCard"><button class="rjclose" aria-label="Close">×</button><h2>Book a lesson</h2><div class="rjcalhead"><button id="rjPrev">‹</button><strong id="rjMonth"></strong><button id="rjNext">›</button></div><div class="rjcalgrid" id="rjCal"></div><div id="rjChosen" style="margin-top:14px"></div><div class="rjtimes" id="rjTimes"></div><button class="rjbookfinal" id="rjConfirm" disabled>Book lesson</button></div></div>
+<script>
+(function(){
+  const synth=window.speechSynthesis;
+  function bestUKVoice(){
+    if(!synth) return null;
+    const v=synth.getVoices();
+    return v.find(x=>/en-GB/i.test(x.lang)&&/(natural|neural|google|microsoft|serena|sonia|ryan|libby|maisie)/i.test(x.name))
+        || v.find(x=>/en-GB/i.test(x.lang)) || v.find(x=>/^en/i.test(x.lang)) || null;
+  }
+  const NativeUtter=window.SpeechSynthesisUtterance;
+  if(NativeUtter){
+    window.SpeechSynthesisUtterance=function(t){
+      const u=new NativeUtter(t); const v=bestUKVoice(); if(v)u.voice=v; u.lang='en-GB'; u.rate=.94; u.pitch=1; return u;
+    };
+    window.SpeechSynthesisUtterance.prototype=NativeUtter.prototype;
+  }
+  if(synth) synth.onvoiceschanged=()=>bestUKVoice();
+
+  document.querySelectorAll('a,button').forEach(el=>{
+    const t=(el.textContent||'').trim().toLowerCase();
+    if(t==='use my email app'||t==='use email app') el.remove();
+  });
+
+  const modal=document.getElementById('rjBookingModal'), cal=document.getElementById('rjCal'), monthEl=document.getElementById('rjMonth'), times=document.getElementById('rjTimes'), chosen=document.getElementById('rjChosen'), confirm=document.getElementById('rjConfirm');
+  let view=new Date(); view.setDate(1); let selectedDate=null, selectedTime=null;
+  const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  function render(){
+    cal.innerHTML='';
+    weekdays.forEach(w=>{const d=document.createElement('div');d.className='rjweekday';d.textContent=w;cal.appendChild(d)});
+    monthEl.textContent=view.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    const first=(view.getDay()+6)%7, days=new Date(view.getFullYear(),view.getMonth()+1,0).getDate(), today=new Date(); today.setHours(0,0,0,0);
+    for(let i=0;i<first;i++) cal.appendChild(document.createElement('div'));
+    for(let d=1;d<=days;d++){
+      const dt=new Date(view.getFullYear(),view.getMonth(),d); const b=document.createElement('button'); b.className='rjday'; b.textContent=d;
+      if(dt<today)b.classList.add('disabled');
+      b.onclick=()=>{selectedDate=dt;selectedTime=null; document.querySelectorAll('.rjday.sel').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); showTimes();};
+      cal.appendChild(b);
+    }
+  }
+  function showTimes(){
+    chosen.textContent='Selected date: '+selectedDate.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    times.innerHTML=''; ['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'].forEach(t=>{const b=document.createElement('button');b.className='rjtime';b.textContent=t;b.onclick=()=>{selectedTime=t;document.querySelectorAll('.rjtime.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');confirm.disabled=false;};times.appendChild(b)});
+  }
+  function openBooking(){modal.style.display='flex';render();}
+  document.addEventListener('click',e=>{const el=e.target.closest('a,button');if(!el)return;const t=(el.textContent||'').trim().toLowerCase();if(t==='book lesson'||t==='book a lesson'){e.preventDefault();openBooking();}});
+  document.querySelector('.rjclose').onclick=()=>modal.style.display='none'; modal.onclick=e=>{if(e.target===modal)modal.style.display='none'};
+  document.getElementById('rjPrev').onclick=()=>{view.setMonth(view.getMonth()-1);render()}; document.getElementById('rjNext').onclick=()=>{view.setMonth(view.getMonth()+1);render()};
+  confirm.onclick=()=>{if(!selectedDate||!selectedTime)return; localStorage.setItem('rjLessonBooking',JSON.stringify({date:selectedDate.toISOString().slice(0,10),time:selectedTime})); alert('Lesson selected for '+selectedDate.toLocaleDateString('en-GB')+' at '+selectedTime+'.');};
+})();
+<\/script>`;
+  html=html.replace(/<\/body>/i,patch+'</body>');
+  document.open();document.write(html);document.close();
+}catch(e){document.body.innerHTML='<div class="msg"><h1>RJ Language Academy</h1><p>Preview failed to load.</p><pre>'+String(e)+'</pre></div>'}
+})();
+</script></body></html>
