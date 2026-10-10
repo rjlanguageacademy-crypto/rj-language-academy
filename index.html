@@ -72,6 +72,9 @@ try{
 })();
 <\/script>`;
   html=html.replace(/<\/body>/i,patch+'</body>');
+  // Non-destructive modern header entry for the interactive member studios.
+  // The existing landing page and its v43 source remain unchanged.
+  html=html.replace(/<\\/body>/i, '<a id="rjStudioEntry" href="/members-studio.html" style="position:fixed;z-index:9999;bottom:16px;right:16px;display:inline-flex;align-items:center;gap:7px;background:#56348d;color:#fff;border:1px solid #cdb3ed;padding:12px 15px;border-radius:999px;box-shadow:0 9px 28px #210e4438;text-decoration:none;font:700 12px Arial,sans-serif">✦ Explore Member Studios</a></body>');
   document.open();document.write(html);document.close();
 }catch(e){document.body.innerHTML='<div class="msg"><h1>RJ Language Academy</h1><p>Preview failed to load.</p><pre>'+String(e)+'</pre></div>'}
 })();
