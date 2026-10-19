@@ -731,6 +731,8 @@ const holder=document.createElement("div");holder.innerHTML=courseBrowser();pane
 const input=document.getElementById("rj108Search");input?.focus();input?.setSelectionRange(sel,sel);
 },true);
 const oldGuide=labGuide;labGuide=function(){const unit=labUnit();return unit?.guide||oldGuide();};
+// Refresh the page after installing the course-browser wrapper, including on initial open.
+if(typeof labR==="function")labR();
 })();
 </script>
 </body></html>
